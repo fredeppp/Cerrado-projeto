@@ -1,0 +1,53 @@
+
+/* Estilo geral da página */
+body {
+    background-color: #faf8f8; 
+    color: #000000;          
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center; 
+}
+
+
+.creditos-container {
+    background-color: #2a2a2a;
+    padding: 40px;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    text-align: center;      
+}
+
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    color: #4da6ff;
+}
+
+
+h2 {
+    font-size: 1.2em;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    color: #ffcc00;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+ul {
+    list-style: none; 
+    padding: 0;
+    margin: 0;
+}
+
+
+li {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: #dddddd;
+}
