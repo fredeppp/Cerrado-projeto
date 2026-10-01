@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cerrado</title>
+
+  <!-- O elemento de áudio no HTML -->
+  <audio id="meu-player" controls></audio>
+  
+  <script>
+      // Variável global para controlar o áudio atual e poder pará-lo
+    let audioAtual = null;
+
+    function parar_audio() {
+      if (audioAtual) {
+        audioAtual.pause();
+        audioAtual.currentTime = 0;
+        audioAtual = null;
+      }
+    }
+
+    function tocar_audio(nome, pastaOuDublador) {
+      // Para qualquer áudio que esteja tocando antes de iniciar o próximo
+      parar_audio();
+
+      let caminho = "";
+      
+      // Se passou uma pasta ou dublador específica (ex: "Fauna" ou "Lilia")
+      if (pastaOuDublador) {
+        caminho = `audio/${pastaOuDublador}/${nome}.mp3`;
+      } else {
+        // Se não passou nada, procura na raiz da pasta audio (ex: intro.mp3)
+        caminho = `audio/${nome}.mp3`;
+      }
+
+      audioAtual = new Audio(caminho);
+  
+      audioAtual.play().catch(erro => {
+        console.log("Erro ao tocar o áudio:", erro);
+      });
+    }
+  </script>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React e ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script>
+    function abrirOutraPagina() {
+      window.location.href = "outro-arquivo.html";
+    }
+  </script>
+
+  <!-- Sistema de Pontuação e Efeitos Separado -->
+  <script src="pontuacao.js" defer></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background-image: url('fundo.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // BANCO DE DADOS DO QUIZ
+    const QUIZ_DATA = {
+      FAUNA: [
+        {
+          question: "Quem é o embaixador das serras mineiras que adora comer a fruta lobeira e espalhar sementes?",
+          correctIndex: 0,
+          options: [
+            { title: "Lobo-Guará", file: "lobo-guara.png", icon: "🦊"},
+            { title: "Tamanduá-Bandeira", file: "tamandua bandeira.png", icon: "🦡"},
+            { title: "Seriema", file: "seriema.png", icon: "🦩"},
+            { title: "Onça Parda", file: "onça parda.png", icon: "🦛"}
+          ]
+        },
+        {
+          question: "Quem é o campeão em comer cupins e formigas para proteger as pastagens?",
+          correctIndex: 1,
+          options: [
+            { title: "Lobo-Guará", file: "lobo-guara.png", icon: "🦊"},
+            { title: "Tamanduá-Bandeira", file: "tamandua bandeira.png", icon: "🦡"},
+            { title: "Pato-Mergulhão", file: "pato mergulhao.png", icon: "🦆"},
+            { title: "Seriema", file: "seriema.png", icon: "🦩"}
+          ]
+        },
+        {
+          question: "Qual é a ave de pernas longas com um canto alto que marca as manhãs no campo em Minas?",
+          correctIndex: 2,
+          options: [
+            { title: "Pato-Mergulhão", file: "pato mergulhao.png", icon: "🦆"},
+            { title: "Carcará", file: "carcara.png", icon: "🦅" },
+            { title: "Seriema", file: "seriema.PNG", icon: "🦩"},
+            { title: "Tucano", file: "tucano.PNG", icon: "🦜"}
+          ]
+        },
+        {
+          question: "Qual é o animal semi-aguatico do cerrado considerado o maior roedor do mundo?",
+          correctIndex: 3,
+          options: [
+            { title: "Tatu-Canastra", file: "tatu canastra.PNG", icon: "🦔"},
+            { title: "Onça Parda", file: "onça parda.png", icon: "🦊"},
+            { title: "Gambá", file: "gamba.png", icon: "🦌", cornerLabel: "Canto Inf. Esq." },
+            { title: "Capivara", file: "capivara.png", icon: "🦛"}
+          ]
+        }
+      ],
+      FLORA: [
+        {
+          question: "Qual é o fruto rei da culinária mineira, muito famoso no preparo com arroz e frango?",
+          correctIndex: 0,
+          options: [
+            { title: "Pequi", file: "pequi.png", icon: "🟡"},
+            { title: "Baru", file: "baru.png", icon: "🌰"},
+            { title: "Cajuzinho-do-Cerrado", file: "cajuzinho-do-cerrado.png", icon: "🥭"},
+            { title: "Mangaba", file: "mangaba.png", icon: "🍈"}
+          ]
+        },
+        {
+          question: "Qual é a castanha supernutritiva do Cerrado que possui uma casca bem dura?",
+          correctIndex: 1,
+          options: [
+            { title: "Pequi", file: "pequi.png", icon: "🟡"},
+            { title: "Baru", file: "baru.png", icon: "🌰"},
+            { title: "Castanha-de-Caju", file: "castanha-de-caju.png", icon: "🥜" },
+            { title: "Amendoim", file: "amendoin.png", icon: "🥜" }
+          ]
+        },
+        {
+          question: "Qual é o fruto nativo pequeno, azedinho e que é uma verdadeira bomba de vitamina C?",
+          correctIndex: 2,
+          options: [
+            { title: "Gravatá", file: "Gravatá.jpg", fallbackFiles: ["Gravata.png", "gravata.png"], icon: "🪴"},
+            { title: "Lobeira", file: "Lobeira.jpg", fallbackFiles: ["lobeira.jpg", "lobeira.png"], icon: "🟢"},
+            { title: "Cajuzinho-do-Cerrado", file: "cajuzinho-do-cerrado.png", icon: "🥭" },
+            { title: "Pitanga", file: "pitanga.png", icon: "🍒"}
+          ]
+        },
+        {
+          question: "Qual é a árvore de flores amarelas radiantes que colore a paisagem na época da seca mineira?",
+          correctIndex: 3,
+          options: [
+            { title: "Jacarandá", file: "jacaranda.png", icon: "💜" },
+            { title: "Pau-Tucano", file: "pau-tucano.png", icon: "🌸"},
+            { title: "Cambuí", file: "cambuí.png", icon: "🌿"},
+            { title: "Ipê-Amarelo", file: "ipê-amarelo.png", icon: "🌼" }
+          ]
+        }
+      ],
+      SOLO: [
+        {
+          question: "Como a ciência e a tecnologia transformaram a terra antigamente considerada 'ácida' em uma terra fértil?",
+          correctIndex: 0,
+          options: [
+            { title: "Calagem do Solo", file: "calagem do solo.png", icon: "🧪"},
+            { title: "Uso de Fogo", file: "uso do fogo.png", icon: "🔥" },
+            { title: "Irrigação Excessiva", file: "irrigação.png", icon: "💧" },
+            { title: "Desmatamento do Cerrado", file: "desmatamento do cerrado.png", icon: "🪓" }
+          ]
+        },
+        {
+          question: "Qual o maior rio que tem sua nascente na região do alto Paranaíba (mata da corda)?",
+          correctIndex: 1,
+          options: [
+            { title: "Rio Aragari", file: "aragari.png", icon: "🌧️" },
+            { title: "Rio Paranaíba", file: "nacente_paranaiba.png", icon: "🏞️" },
+            { title: "Rio Abaeté", file: "nacente_abaite.png", icon: "🌊" },
+            { title: "Rio Doce", file: "Rio_Doce.jpg", icon: "💧" }
+          ]
+        },
+        {
+          question: "Qual é o produto de altíssima qualidade cultivado nas altitudes do Cerrado Mineiro e exportado para o mundo?",
+          correctIndex: 2,
+          options: [
+            { title: "Uva", file: "uva.png", icon: "🍇" },
+            { title: "Soja", file: "soja.PNG", icon: "🌱"},
+            { title: "Café Especial", file: "café.png", icon: "☕"},
+            { title: "Milho", file: "milho.png", icon: "🌽" }
+          ]
+        },
+        {
+          question: "Qual é o minerio estraido no município Araxá que possui as maiores reservas do planeta?",
+          correctIndex: 3,
+          options: [
+            { title: "Calcario", file: "calcario.PNG", icon: ":3"},
+            { title: "Minerio de Ferro", file: "ferro.PNG", icon: "frx was here"},
+            { title: "Fosfato", file: "fosfato.PNG", icon: "-_-"},
+            { title: "Nióbio", file: "niobio.PNG", icon: "bye"}
+          ]
+        }
+      ]
+    };
+
+    // Componente Mascote Lobo-Guará
+    const LoboGuaraMascot = ({ expression = 'neutral', isSpeaking = false, size = 'normal' }) => {
+      const sizeClasses = {
+        small: 'w-24 h-24 sm:w-28 sm:h-28',
+        normal: 'w-36 h-36 sm:w-44 sm:h-44',
+        large: 'w-48 h-48 sm:w-60 sm:h-60'
+      };
+
+      return (
+        <div className={`relative flex items-center justify-center transition-transform duration-300 ${sizeClasses[size]}`}>
+          <svg viewBox="0 0 200 220" className={`w-full h-full drop-shadow-2xl ${isSpeaking ? 'animate-bounce' : ''}`} fill="none">
+            <path d="M140 140 C175 120, 195 150, 180 185 C165 205, 130 180, 130 160 Z" fill="#D96B27" stroke="#8C330C" strokeWidth="3"/>
+            <path d="M168 172 C178 177, 188 165, 178 182 Z" fill="#FFFFFF" />
+            <ellipse cx="100" cy="160" rx="45" ry="40" fill="#D96B27" stroke="#8C330C" strokeWidth="3" />
+            <ellipse cx="100" cy="165" rx="28" ry="25" fill="#FDF6E2" />
+            <rect x="75" y="185" width="12" height="32" rx="6" fill="#2C221E" />
+            <rect x="113" y="185" width="12" height="32" rx="6" fill="#2C221E" />
+            <path d="M58 72 L42 12 L80 48 Z" fill="#D96B27" stroke="#8C330C" strokeWidth="3" />
+            <path d="M60 67 L50 26 L74 50 Z" fill="#2C221E" />
+            <path d="M142 72 L158 12 L120 48 Z" fill="#D96B27" stroke="#8C330C" strokeWidth="3" />
+            <path d="M140 67 L150 26 L126 50 Z" fill="#2C221E" />
+            <path d="M50 90 C50 50, 150 50, 150 90 C150 120, 130 135, 100 135 C70 135, 50 120, 50 90 Z" fill="#D96B27" stroke="#8C330C" strokeWidth="3" />
+            <path d="M65 100 C65 80, 135 80, 135 100 C135 125, 120 135, 100 135 C80 135, 65 125, 65 100 Z" fill="#FDF6E2" />
+            {expression === 'celebrate' || expression === 'happy' ? (
+              <>
+                <path d="M72 85 Q80 75 88 85" stroke="#2C221E" strokeWidth="4" strokeLinecap="round" fill="none" />
+                <path d="M112 85 Q120 75 128 85" stroke="#2C221E" strokeWidth="4" strokeLinecap="round" fill="none" />
+              </>
+            ) : expression === 'thinking' ? (
+              <>
+                <circle cx="80" cy="85" r="7" fill="#2C221E" />
+                <circle cx="78" cy="83" r="2.5" fill="#FFFFFF" />
+                <path d="M112 82 L128 86" stroke="#2C221E" strokeWidth="3" strokeLinecap="round" />
+              </>
+            ) : (
+              <>
+                <circle cx="80" cy="85" r="7" fill="#2C221E" />
+                <circle cx="120" cy="85" r="7" fill="#2C221E" />
+                <circle cx="78" cy="83" r="2.5" fill="#FFFFFF" />
+                <circle cx="118" cy="83" r="2.5" fill="#FFFFFF" />
+              </>
+            )}
+            <polygon points="100,98 92,108 108,108" fill="#2C221E" />
+            {isSpeaking ? (
+              <ellipse cx="100" cy="116" rx="6" ry="8" fill="#2C221E" />
+            ) : expression === 'celebrate' || expression === 'happy' ? (
+              <path d="M92 112 Q100 124 108 112" stroke="#2C221E" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+            ) : (
+              <path d="M100 108 L100 115 C95 117, 90 114, 88 112 M100 115 C105 117, 110 114, 112 112" stroke="#2C221E" strokeWidth="2.5" strokeLinecap="round"/>
+            )}
+          </svg>
+        </div>
+      );
+    };
+
+    // Componente de Imagem Inteligente
+    const QuizImage = ({ fileName, fallbackFiles = [], altText, icon }) => {
+      const [currentStep, setCurrentStep] = useState(0);
+      const [webUrl, setWebUrl] = useState(null);
+      const [isSearching, setIsSearching] = useState(false);
+
+      const storageKey = `cerrado_img_${altText.toLowerCase().replace(/\s+/g, '_')}`;
+
+      useEffect(() => {
+        try {
+          const savedUrl = localStorage.getItem(storageKey);
+          if (savedUrl) setWebUrl(savedUrl);
+        } catch (e) {}
+      }, [storageKey]);
+
+      const buildCandidates = (mainFile, fallbacks) => {
+        const list = [mainFile, ...fallbacks];
+        const extra = [];
+        list.forEach(f => {
+          if (!f) return;
+          const noAccents = f.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (noAccents !== f) extra.push(noAccents);
+          if (f.endsWith('.png')) extra.push(f.replace('.png', '.jpg'), f.replace('.png', '.jpeg'));
+          if (f.endsWith('.jpg')) extra.push(f.replace('.jpg', '.png'), f.replace('.jpg', '.jpeg'));
+          extra.push(f.toLowerCase());
+        });
+        return Array.from(new Set([...list, ...extra]));
+      };
+
+      const candidates = buildCandidates(fileName, fallbackFiles);
+
+      const searchAndSaveWebImage = async () => {
+        setIsSearching(true);
+        try {
+          const query = encodeURIComponent(`${altText} cerrado brasil`);
+          const res = await fetch(`https://source.unsplash.com/400x300/?${query}`);
+          if (res.ok && res.url) {
+            setWebUrl(res.url);
+            try { localStorage.setItem(storageKey, res.url); } catch (e) {}
+          } else {
+            const backupUrl = `https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=400&q=80`;
+            setWebUrl(backupUrl);
+            try { localStorage.setItem(storageKey, backupUrl); } catch (e) {}
+          }
+        } catch (e) {
+          console.warn("Não foi possível buscar na web:", e);
+        } finally {
+          setIsSearching(false);
+        }
+      };
+
+      const handleError = () => {
+        if (currentStep < candidates.length - 1) {
+          setCurrentStep(prev => prev + 1);
+        } else if (!webUrl && !isSearching) {
+          searchAndSaveWebImage();
+        }
+      };
+
+      if (webUrl) {
+        return (
+          <img
+            src={webUrl}
+            alt={altText}
+            className="w-full h-full object-cover"
+            onError={() => {
+              try { localStorage.removeItem(storageKey); } catch (e) {}
+              setWebUrl(null);
+            }}
+          />
+        );
+      }
+
+      if (isSearching) {
+        return (
+          <div className="w-full h-full bg-amber-100/50 backdrop-blur-sm flex flex-col items-center justify-center p-1 text-center">
+            <span className="text-xs animate-spin">🔍</span>
+            <span className="text-[8px] font-bold text-amber-950">Buscando...</span>
+          </div>
+        );
+      }
+
+      if (currentStep >= candidates.length && !webUrl) {
+        return (
+          <div className="w-full h-full bg-amber-200/50 backdrop-blur-sm flex flex-col items-center justify-center p-1 text-center border border-amber-300/40">
+            <span className="text-2xl">{icon}</span>
+            <span className="text-[9px] font-bold text-amber-950 leading-tight truncate max-w-full">
+              {altText}
+            </span>
+          </div>
+        );
+      }
+
+      const currentPath = `imagens/${candidates[currentStep]}`;
+
+      return (
+        <img
+          src={currentPath}
+          alt={altText}
+          className="w-full h-full object-cover"
+          onError={handleError}
+        />
+      );
+    };
+
+    // Componente Principal
+    function App() {
+      const [screen, setScreen] = useState('WELCOME');
+      const [voiceEnabled, setVoiceEnabled] = useState(true);
+      const [isSpeaking, setIsSpeaking] = useState(false);
+      
+      const [score, setScore] = useState(window.scoreSystem ? window.scoreSystem.score : 0);
+      const [highScore, setHighScore] = useState(window.scoreSystem ? window.scoreSystem.highScore : 0);
+
+      const [poemGrade, setPoemGrade] = useState('6');
+      const [quizTopic, setQuizTopic] = useState('FAUNA');
+      const [questionIndex, setQuestionIndex] = useState(0);
+      const [mascotExpr, setMascotExpr] = useState('neutral');
+      const [selectedOption, setSelectedOption] = useState(null);
+      const [answerState, setAnswerState] = useState(null);
+      
+      const speakText = (text) => {
+        // Opcional para voz sintetizada do navegador
+      };
+
+      const changeScreen = (nextScreen) => {
+        parar_audio();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+        setScreen(nextScreen);
+
+        if (nextScreen === 'WELCOME') {
+          setMascotExpr('happy');
+          tocar_audio("intro");
+        } else if (nextScreen === 'MAP_SCREEN') {
+          setMascotExpr('happy');
+          tocar_audio("intro");
+        } else if (nextScreen === 'THEME_SELECT') {
+          setMascotExpr('happy');
+          tocar_audio("intro2");
+        }
+      };
+
+      const startQuiz = (topic) => {
+        setQuizTopic(topic);
+        setQuestionIndex(0);
+        setSelectedOption(null);
+        setAnswerState(null);
+        setMascotExpr('thinking');
+        setScreen('QUIZ_PLAY');
+
+        const firstQ = QUIZ_DATA[topic][0];
+        if (firstQ) {
+          speakText(firstQ.question);
+          // Toca o áudio da primeira pergunta logo ao iniciar
+          tocar_audio("pergunta1", topic);
+        }
+      };
+
+      const handleCornerSelect = (index) => {
+        if (answerState === 'correct') return;
+
+        // PARAR O ÁUDIO ASSIM QUE A RESPOSTA FOR ENTREGUE
+        parar_audio();
+
+        const currentQ = QUIZ_DATA[quizTopic][questionIndex];
+        setSelectedOption(index);
+
+        if (index === currentQ.correctIndex) {
+          const res = window.scoreSystem ? window.scoreSystem.addPoints(10) : { totalScore: score + 10 };
+          setScore(res.totalScore);
+          if (window.scoreSystem) setHighScore(window.scoreSystem.highScore);
+
+          setAnswerState('correct');
+          setMascotExpr('celebrate');
+
+          let dublador = "Lilia"; // Valor padrão
+
+          if (quizTopic === "FAUNA") {
+            dublador = "Lilia";
+          } else if (quizTopic === "FLORA") {
+            dublador = "Laura";
+          } else if (quizTopic === "SOLO") {
+            dublador = "Maria"; // ou o nome da pasta correspondente na sua estrutura
+          }
+
+          tocar_audio("correto", dublador);
+          speakText("Muito bem! Resposta correta!");
+
+          setTimeout(() => {
+            if (questionIndex + 1 < QUIZ_DATA[quizTopic].length) {
+              const nextIdx = questionIndex + 1;
+              setQuestionIndex(nextIdx);
+              setSelectedOption(null);
+              setAnswerState(null);
+              setMascotExpr('thinking');
+              speakText(QUIZ_DATA[quizTopic][nextIdx].question);
+              
+              const categoria = quizTopic; 
+              let numeroDaPergunta = nextIdx + 1;
+              
+              const pastaTema = quizTopic.charAt(0) + quizTopic.slice(1).toLowerCase(); 
+              
+              tocar_audio("pergunta" + numeroDaPergunta, pastaTema);
+            } else {
+              if (window.scoreSystem) window.scoreSystem.playFanfare();
+              setScreen('QUIZ_RESULTS');
+              setMascotExpr('celebrate');
+              speakText("Sensacional! Concluiu o Quiz com sucesso!");
+            }
+          }, 1800);
+        } else {
+          const res = window.scoreSystem ? window.scoreSystem.removePoints(5) : { totalScore: Math.max(0, score - 5) };
+          setScore(res.totalScore);
+
+          setAnswerState('wrong');
+          setMascotExpr('thinking');
+          let dublador = "Lilia"; // Valor padrão
+
+          if (quizTopic === "FAUNA") {
+            dublador = "Lilia";
+          } else if (quizTopic === "FLORA") {
+            dublador = "Laura";
+          } else if (quizTopic === "SOLO") {
+            dublador = "Maria"; // ou o nome da pasta correspondente na sua estrutura
+          }
+
+          tocar_audio("incorreto", dublador);
+          speakText("Ops, resposta incorreta. Tente outra vez!");
+        }
+      };
+
+      return (
+        <div className="min-h-screen text-slate-800 flex flex-col justify-between p-4 relative z-10">
+          {/* BARRA SUPERIOR */}
+          <header className="max-w-4xl mx-auto w-full flex justify-between items-center bg-white/40 backdrop-blur-md p-3 rounded-2xl shadow-lg border border-white/50 mb-4">
+            <div className="flex items-center space-x-2">
+              <span className="bg-amber-400/90 backdrop-blur-sm font-black px-7 py-6 rounded-full text-lg shadow animate-pulse text-amber-950">
+                🪙 {score} pts
+              </span>
+              <button 
+                onClick={() => changeScreen('WELCOME')}
+                className="bg-white/500 hover:bg-white/900 font-black px-7 py-6 text-text-xl backdrop-blur-sm p-2 rounded-full font-bold transition shadow-sm border border-white/50"
+              >
+                🏠
+              </button>
+            </div>
+          </header>
+
+          {/* CONTEÚDO PRINCIPAL */}
+          <main className="max-w-4xl mx-auto w-full flex-grow flex items-center justify-center">
+            
+            {/* TELA DE BOAS-VINDAS */}
+            {screen === 'WELCOME' && (
+              <div className="bg-white/40 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/60 text-center w-full flex flex-col items-center">
+                <h1 className="text-3xl sm:text-5xl font-black text-orange-800 mb-3 drop-shadow">
+                  Tesouros Do Cerrado
+                </h1>
+                <LoboGuaraMascot expression={mascotExpr} isSpeaking={isSpeaking} size="large" />
+
+                <button
+                  onClick={() => changeScreen('THEME_SELECT')}
+                  className="px-8 py-4 bg-orange-600/90 hover:bg-orange-600 text-white text-2xl font-black rounded-2xl shadow-xl transition transform active:scale-95 backdrop-blur-sm border border-orange-400/50"
+                >
+                  INICIAR AVENTURA
+                </button>
+              </div>
+            )}
+
+            {/* SELEÇÃO DO QUE FAZER */}
+            {screen === 'THEME_SELECT' && (
+              <div className="bg-white/40 backdrop-blur-lg p-6 rounded-3xl shadow-2xl border border-white/60 text-center w-full flex flex-col items-center">
+                <LoboGuaraMascot expression="happy" isSpeaking={isSpeaking} size="normal" />
+                
+                <h2 className="text-2xl font-black text-amber-950 my-3 drop-shadow-sm">
+                  "O Cerrado Mineiro é cheio de Tesouros. Que tal descobrimos alguns deles?"
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 w-full max-w-lg mt-2">
+                  <button
+                    onClick={() => changeScreen('QUIZ_TOPIC')}
+                    className="p-6 bg-orange-600/90 hover:bg-orange-600 backdrop-blur-sm border border-orange-400/50 text-white rounded-2xl font-black text-xl shadow-lg flex flex-col items-center justify-center space-y-2 transition transform active:scale-95"
+                  >
+                    <span>JOGAR</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* SELEÇÃO DO TEMA DO QUIZ */}
+            {screen === 'QUIZ_TOPIC' && (
+              <div className="bg-white/40 backdrop-blur-lg p-6 rounded-3xl shadow-2xl border border-white/60 text-center w-full">
+                <h2 className="text-2xl font-black text-amber-950 mb-6 drop-shadow-sm">Por onde começa sua aventura?</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <button
+                    onClick={() => startQuiz('FAUNA')}
+                    className="p-6 bg-orange-500/90 hover:bg-orange-500 backdrop-blur-sm border border-orange-300/50 text-white rounded-2xl font-black text-lg shadow-lg flex flex-col items-center justify-center space-y-2 transition transform active:scale-95"
+                  >
+                    <span>FAUNA</span>
+                  </button>
+                  <button
+                    onClick={() => startQuiz('FLORA')}
+                    className="p-6 bg-emerald-600/90 hover:bg-emerald-600 backdrop-blur-sm border border-emerald-400/50 text-white rounded-2xl font-black text-lg shadow-lg flex flex-col items-center justify-center space-y-2 transition transform active:scale-95"
+                  >
+                    <span>FLORA</span>
+                  </button>
+                  <button
+                    onClick={() => startQuiz('SOLO')}
+                    className="p-6 bg-amber-800/90 hover:bg-amber-800 backdrop-blur-sm border border-amber-600/50 text-white rounded-2xl font-black text-lg shadow-lg flex flex-col items-center justify-center space-y-2 transition transform active:scale-95"
+                  >
+                    <span>SOLO E ÁGUAS</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* TELA DE JOGO DO QUIZ */}
+            {screen === 'QUIZ_PLAY' && (
+              <div className="bg-white/40 backdrop-blur-lg p-6 rounded-3xl shadow-2xl border border-white/60 w-full flex flex-col justify-between min-h-[520px]">
+                <div className="flex justify-between items-center font-black text-sm text-amber-950 border-b border-amber-950/20 pb-2">
+                  <span>ÁREA: {quizTopic}</span>
+                  <span>Pergunta {questionIndex + 1} de {QUIZ_DATA[quizTopic].length}</span>
+                </div>
+
+                <div className="my-3 text-center flex flex-col items-center">
+                  <LoboGuaraMascot expression={mascotExpr} isSpeaking={isSpeaking} size="small" />
+                  <div className="bg-white/50 backdrop-blur-sm border border-white/60 p-4 rounded-2xl my-2 font-black text-base sm:text-lg text-slate-800 w-full shadow-sm">
+                    {QUIZ_DATA[quizTopic][questionIndex].question}
+                  </div>
+                </div>
+
+                {/* GRELHA DOS 4 CANTOS */}
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  {QUIZ_DATA[quizTopic][questionIndex].options.map((opt, idx) => {
+                    const isSelected = selectedOption === idx;
+                    let borderStyle = "border border-white/60 bg-white/40 hover:bg-white/60 backdrop-blur-sm";
+
+                    if (isSelected && answerState === 'correct') {
+                      borderStyle = "border-4 border-emerald-500 bg-emerald-100/80 backdrop-blur-md";
+                    } else if (isSelected && answerState === 'wrong') {
+                      borderStyle = "border-4 border-red-500 bg-red-100/80 backdrop-blur-md";
+                    }
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleCornerSelect(idx)}
+                        className={`p-3 rounded-2xl shadow-md transition flex items-center space-x-3 text-left ${borderStyle}`}
+                      >
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-amber-100/50 flex-shrink-0 relative border border-white/40 shadow-inner">
+                          <QuizImage 
+                            fileName={opt.file} 
+                            fallbackFiles={opt.fallbackFiles}
+                            altText={opt.title} 
+                            icon={opt.icon} 
+                          />
+                        </div>
+                        <div className="flex-grow min-w-0">
+                          <span className="block text-[10px] font-black text-amber-900 uppercase opacity-80">
+                            {opt.cornerLabel}
+                          </span>
+                          <span className="font-black text-slate-800 text-sm sm:text-base leading-tight block truncate">
+                            {opt.title}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* TELA DE RESULTADOS */}
+            {screen === 'QUIZ_RESULTS' && (
+              <div className="bg-white/40 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/60 text-center w-full flex flex-col items-center">
+                <span className="text-6xl mb-2">🎉</span>
+                <h2 className="text-3xl font-black text-orange-800 drop-shadow">Parabéns!</h2>
+                <LoboGuaraMascot expression="celebrate" isSpeaking={isSpeaking} size="normal" />
+                <p className="text-xl font-bold my-2 text-slate-800">Obrigado por Jogar e Aprender com a gente!</p>
+                <p className="text-lg font-black text-amber-950 mb-4 bg-amber-300/50 px-4 py-1 rounded-full border border-amber-400/40">
+                  Pontuação Total: {score} pontos
+                </p>
+                <button
+                  onClick={() => changeScreen('THEME_SELECT')}
+                  className="px-8 py-3 bg-orange-600/90 hover:bg-orange-600 text-white font-black rounded-xl shadow-lg text-lg backdrop-blur-sm border border-orange-400/50"
+                >
+                  Jogar Novamente
+                </button>
+              </div>
+            )}
+
+          </main>
+
+          <footer className="text-center text-xs font-bold text-amber-950/80 my-4 bg-white/20 backdrop-blur-sm py-1 px-4 rounded-full max-w-fit mx-auto border border-white/30">
+            Cerrado Mineiro • Projeto Educativo E.E.A.A - 2026
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
+<!--
+  _._     _,-'""`-._
+ (,-.`._,'(       |\`-/|
+     `-.-' \ )-`( , o o)
+           `-    \`_`"'-
+                        frx
+-->
