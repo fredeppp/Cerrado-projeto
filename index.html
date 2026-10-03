@@ -462,7 +462,7 @@
               tocar_audio("final", dublador);
               speakText("Sensacional! Concluiu o Quiz com sucesso!");
             }
-          }, 1800);
+          }, 3000);
         } else {
           const res = window.scoreSystem ? window.scoreSystem.removePoints(5) : { totalScore: Math.max(0, score - 5) };
           setScore(res.totalScore);
