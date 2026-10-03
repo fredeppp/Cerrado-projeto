@@ -24,21 +24,39 @@
       // Para qualquer áudio que esteja tocando antes de iniciar o próximo
       parar_audio();
 
-      let caminho = "";
-      
-      // Se passou uma pasta ou dublador específica (ex: "Fauna" ou "Lilia")
-      if (pastaOuDublador) {
-        caminho = `audio/${pastaOuDublador}/${nome}.mp3`;
-      } else {
-        // Se não passou nada, procura na raiz da pasta audio (ex: intro.mp3)
-        caminho = `audio/${nome}.mp3`;
+      if (!pastaOuDublador) {
+        audioAtual = new Audio(`audio/${nome}.mp3`);
+        audioAtual.play().catch(erro => {
+          console.log("Erro ao tocar o áudio da raiz:", erro);
+        });
+        return;
       }
 
-      audioAtual = new Audio(caminho);
-  
-      audioAtual.play().catch(erro => {
-        console.log("Erro ao tocar o áudio:", erro);
-      });
+      // Gera variações de nomes de pastas para evitar erros de maiúsculas/minúsculas
+      const p = pastaOuDublador;
+      const pTitle = p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();
+      const pLower = p.toLowerCase();
+      const pUpper = p.toUpperCase();
+      const pastasCandidatas = Array.from(new Set([pTitle, pLower, pUpper, p]));
+
+      let index = 0;
+
+      function tentarTocar() {
+        if (index >= pastasCandidatas.length) return;
+
+        const pastaAtual = pastasCandidatas[index];
+        const caminho = `audio/${pastaAtual}/${nome}.mp3`;
+
+        audioAtual = new Audio(caminho);
+
+        audioAtual.play().catch(erro => {
+          console.log(`Tentativa de áudio falhou para (${caminho}):`, erro);
+          index++;
+          tentarTocar();
+        });
+      }
+
+      tentarTocar();
     }
   </script>
   
@@ -271,7 +289,6 @@
       const [currentStep, setCurrentStep] = useState(0);
       const [hasError, setHasError] = useState(false);
 
-      // Reinicia os estados ao mudar a imagem ou pergunta
       useEffect(() => {
         setCurrentStep(0);
         setHasError(false);
@@ -356,7 +373,7 @@
       const [answerState, setAnswerState] = useState(null);
       
       const speakText = (text) => {
-        // Opcional para voz sintetizada do navegador
+        // Opcional para voz sintetizada
       };
 
       const changeScreen = (nextScreen) => {
@@ -388,7 +405,8 @@
         const firstQ = QUIZ_DATA[topic][0];
         if (firstQ) {
           speakText(firstQ.question);
-          tocar_audio("pergunta1", topic);
+          const pastaTema = topic.charAt(0) + topic.slice(1).toLowerCase();
+          tocar_audio("pergunta1", pastaTema);
         }
       };
 
@@ -430,9 +448,7 @@
               setMascotExpr('thinking');
               speakText(QUIZ_DATA[quizTopic][nextIdx].question);
               
-              const categoria = quizTopic; 
               let numeroDaPergunta = nextIdx + 1;
-              
               const pastaTema = quizTopic.charAt(0) + quizTopic.slice(1).toLowerCase(); 
               
               tocar_audio("pergunta" + numeroDaPergunta, pastaTema);
