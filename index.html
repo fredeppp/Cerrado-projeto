@@ -269,17 +269,13 @@
     // Componente de Imagem Inteligente
     const QuizImage = ({ fileName, fallbackFiles = [], altText, icon }) => {
       const [currentStep, setCurrentStep] = useState(0);
-      const [webUrl, setWebUrl] = useState(null);
-      const [isSearching, setIsSearching] = useState(false);
+      const [hasError, setHasError] = useState(false);
 
-      const storageKey = `cerrado_img_${altText.toLowerCase().replace(/\s+/g, '_')}`;
-
+      // Reinicia os estados ao mudar a imagem ou pergunta
       useEffect(() => {
-        try {
-          const savedUrl = localStorage.getItem(storageKey);
-          if (savedUrl) setWebUrl(savedUrl);
-        } catch (e) {}
-      }, [storageKey]);
+        setCurrentStep(0);
+        setHasError(false);
+      }, [fileName, altText]);
 
       const buildCandidates = (mainFile, fallbacks = []) => {
         const list = [mainFile, ...(fallbacks || [])].filter(Boolean);
@@ -312,58 +308,15 @@
 
       const candidates = buildCandidates(fileName, fallbackFiles);
 
-      const searchAndSaveWebImage = async () => {
-        setIsSearching(true);
-        try {
-          const query = encodeURIComponent(`${altText} cerrado brasil`);
-          const res = await fetch(`https://source.unsplash.com/400x300/?${query}`);
-          if (res.ok && res.url) {
-            setWebUrl(res.url);
-            try { localStorage.setItem(storageKey, res.url); } catch (e) {}
-          } else {
-            const backupUrl = `https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=400&q=80`;
-            setWebUrl(backupUrl);
-            try { localStorage.setItem(storageKey, backupUrl); } catch (e) {}
-          }
-        } catch (e) {
-          console.warn("Não foi possível buscar na web:", e);
-        } finally {
-          setIsSearching(false);
-        }
-      };
-
       const handleError = () => {
         if (currentStep < candidates.length - 1) {
           setCurrentStep(prev => prev + 1);
-        } else if (!webUrl && !isSearching) {
-          searchAndSaveWebImage();
+        } else {
+          setHasError(true);
         }
       };
 
-      if (webUrl) {
-        return (
-          <img
-            src={webUrl}
-            alt={altText}
-            className="w-full h-full object-cover"
-            onError={() => {
-              try { localStorage.removeItem(storageKey); } catch (e) {}
-              setWebUrl(null);
-            }}
-          />
-        );
-      }
-
-      if (isSearching) {
-        return (
-          <div className="w-full h-full bg-amber-100/50 backdrop-blur-sm flex flex-col items-center justify-center p-1 text-center">
-            <span className="text-xs animate-spin">🔍</span>
-            <span className="text-[8px] font-bold text-amber-950">Buscando...</span>
-          </div>
-        );
-      }
-
-      if (currentStep >= candidates.length && !webUrl) {
+      if (hasError || currentStep >= candidates.length) {
         return (
           <div className="w-full h-full bg-amber-200/50 backdrop-blur-sm flex flex-col items-center justify-center p-1 text-center border border-amber-300/40">
             <span className="text-2xl">{icon}</span>
@@ -374,7 +327,6 @@
         );
       }
 
-      // Usa encodeURI para tratar caminhos com espaços e acentos no GitHub Pages
       const currentPath = `imagens/${encodeURI(candidates[currentStep])}`;
 
       return (
@@ -624,7 +576,7 @@
 
                     return (
                       <button
-                        key={idx}
+                        key={`${quizTopic}_q${questionIndex}_opt${idx}`}
                         onClick={() => handleCornerSelect(idx)}
                         className={`p-3 rounded-2xl shadow-md transition flex items-center space-x-3 text-left ${borderStyle}`}
                       >
