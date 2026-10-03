@@ -464,24 +464,31 @@
             }
           }, 3000);
         } else {
-          const novoValor = Math.min(250, score + 10);
-          const res = window.scoreSystem ? window.scoreSystem.addPoints(10) : { totalScore: novoValor };
-          setScore(Math.min(250, res.totalScore));
+            const pontosADescontar = 10;
+            const novoValor = Math.max(0, score - pontosADescontar);
+  
+            if (window.scoreSystem && typeof window.scoreSystem.removePoints === 'function') {
+              window.scoreSystem.removePoints(pontosADescontar);
+            } else if (window.scoreSystem) {
+              window.scoreSystem.score = novoValor;
+            }
+  
+            setScore(novoValor);
 
-          setAnswerState('wrong');
-          setMascotExpr('thinking');
-          let dublador = "Lilia";
+            setAnswerState('wrong');
+            setMascotExpr('thinking');
+            let dublador = "Lilia";
 
-          if (quizTopic === "FAUNA") {
-            dublador = "Lilia";
-          } else if (quizTopic === "FLORA") {
-            dublador = "Laura";
-          } else if (quizTopic === "SOLO") {
-            dublador = "Maria";
-          }
+            if (quizTopic === "FAUNA") {
+              dublador = "Lilia";
+            } else if (quizTopic === "FLORA") {
+              dublador = "Laura";
+            } else if (quizTopic === "SOLO") {
+              dublador = "Maria";
+            }
 
-          tocar_audio("incorreto", dublador);
-          speakText("Ops, resposta incorreta. Tente outra vez!");
+            tocar_audio("incorreto", dublador);
+            speakText("Ops, resposta incorreta. Tente outra vez!");
         }
       };
 
