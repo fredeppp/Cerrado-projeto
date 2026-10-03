@@ -464,8 +464,9 @@
             }
           }, 3000);
         } else {
-          const res = window.scoreSystem ? window.scoreSystem.removePoints(5) : { totalScore: Math.max(0, score - 5) };
-          setScore(res.totalScore);
+          const novoValor = Math.min(250, score + 10);
+          const res = window.scoreSystem ? window.scoreSystem.addPoints(10) : { totalScore: novoValor };
+          setScore(Math.min(250, res.totalScore));
 
           setAnswerState('wrong');
           setMascotExpr('thinking');
