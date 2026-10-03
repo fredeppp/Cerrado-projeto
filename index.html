@@ -529,8 +529,6 @@
         }
       };
 
-      const cornerLabelsDefault = ["Canto Sup. Esq.", "Canto Sup. Dir.", "Canto Inf. Esq.", "Canto Inf. Dir."];
-
       return (
         <div className="min-h-screen text-slate-800 flex flex-col justify-between p-4 relative z-10">
           {/* BARRA SUPERIOR */}
@@ -641,7 +639,7 @@
                   </div>
                 </div>
 
-                {/* GRELHA DOS 4 CANTOS (OPÇÕES EMBARALHADAS) */}
+                {/* GRELHA DOS 4 CANTOS (OPÇÕES EMBARALHADAS SEM RÓTULO DO CANTO) */}
                 <div className="grid grid-cols-2 gap-4 w-full">
                   {currentOptions.map((opt, idx) => {
                     const isSelected = selectedOption === idx;
@@ -668,9 +666,6 @@
                           />
                         </div>
                         <div className="flex-grow min-w-0">
-                          <span className="block text-[10px] font-black text-amber-900 uppercase opacity-80">
-                            {opt.cornerLabel || cornerLabelsDefault[idx]}
-                          </span>
                           <span className="font-black text-slate-800 text-sm sm:text-base leading-tight block truncate">
                             {opt.title}
                           </span>
