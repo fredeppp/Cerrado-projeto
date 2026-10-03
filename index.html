@@ -391,6 +391,9 @@
         } else if (nextScreen === 'THEME_SELECT') {
           setMascotExpr('happy');
           tocar_audio("intro2");
+        } else if (nextScreen === 'QUIZ_TOPIC') {
+          setMascotExpr('happy');
+          tocar_audio("intro4");
         }
       };
 
@@ -456,6 +459,7 @@
               if (window.scoreSystem) window.scoreSystem.playFanfare();
               setScreen('QUIZ_RESULTS');
               setMascotExpr('celebrate');
+              tocar_audio("final", dublador);
               speakText("Sensacional! Concluiu o Quiz com sucesso!");
             }
           }, 1800);
@@ -494,6 +498,12 @@
               >
                 🏠
               </button>
+              <button 
+                onClick={() => location.reload()}
+                className="bg-white/50 hover:bg-white/90 font-black px-7 py-6 backdrop-blur-sm p-2 rounded-full shadow-sm border border-white/50"
+              >
+                🔄️
+              </button>
             </div>
           </header>
 
@@ -530,7 +540,7 @@
                     onClick={() => changeScreen('QUIZ_TOPIC')}
                     className="p-6 bg-orange-600/90 hover:bg-orange-600 backdrop-blur-sm border border-orange-400/50 text-white rounded-2xl font-black text-xl shadow-lg flex flex-col items-center justify-center space-y-2 transition transform active:scale-95"
                   >
-                    <span>JOGAR</span>
+                    <span>SIM</span>
                   </button>
                 </div>
               </div>
