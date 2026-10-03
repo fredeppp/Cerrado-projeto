@@ -99,6 +99,16 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
+    // Função utilitária para embaralhar um array (Algoritmo Fisher-Yates)
+    const shuffleArray = (array) => {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    };
+
     // BANCO DE DADOS DO QUIZ
     const QUIZ_DATA = {
       FAUNA: [
@@ -133,12 +143,12 @@
           ]
         },
         {
-          question: "Qual é o animal semi-aguatico do cerrado considerado o maior roedor do mundo?",
+          question: "Qual é o animal semi-aquático do cerrado considerado o maior roedor do mundo?",
           correctIndex: 3,
           options: [
             { title: "Tatu-Canastra", file: "tatu canastra.PNG", fallbackFiles: ["tatu canastra.png"], icon: "🦔"},
             { title: "Onça Parda", file: "onça parda.png", icon: "🦊"},
-            { title: "Gambá", file: "gamba.png", icon: "🦌", cornerLabel: "Canto Inf. Esq." },
+            { title: "Gambá", file: "gamba.png", icon: "🦌" },
             { title: "Capivara", file: "capivara.png", icon: "🦛"}
           ]
         }
@@ -217,11 +227,11 @@
           ]
         },
         {
-          question: "Qual é o minerio estraido no município Araxá que possui as maiores reservas do planeta?",
+          question: "Qual é o minério extraído no município Araxá que possui as maiores reservas do planeta?",
           correctIndex: 3,
           options: [
-            { title: "Calcario", file: "calcario.PNG", fallbackFiles: ["calcario.png"], icon: ":3"},
-            { title: "Minerio de Ferro", file: "ferro.PNG", fallbackFiles: ["ferro.png"], icon: "frx was here"},
+            { title: "Calcário", file: "calcario.PNG", fallbackFiles: ["calcario.png"], icon: ":3"},
+            { title: "Minério de Ferro", file: "ferro.PNG", fallbackFiles: ["ferro.png"], icon: "frx was here"},
             { title: "Fosfato", file: "fosfato.PNG", fallbackFiles: ["fosfato.png"], icon: "-_-"},
             { title: "Nióbio", file: "niobio.PNG", fallbackFiles: ["niobio.png"], icon: "bye"}
           ]
@@ -368,12 +378,31 @@
       const [poemGrade, setPoemGrade] = useState('6');
       const [quizTopic, setQuizTopic] = useState('FAUNA');
       const [questionIndex, setQuestionIndex] = useState(0);
+
+      // Estado com as opções embaralhadas da pergunta atual
+      const [currentOptions, setCurrentOptions] = useState([]);
+
       const [mascotExpr, setMascotExpr] = useState('neutral');
       const [selectedOption, setSelectedOption] = useState(null);
       const [answerState, setAnswerState] = useState(null);
       
       const speakText = (text) => {
         // Opcional para voz sintetizada
+      };
+
+      // Função para preparar e embaralhar as opções da pergunta
+      const carregarOpcoesAleatorias = (topic, index) => {
+        const questionData = QUIZ_DATA[topic]?.[index];
+        if (!questionData) return;
+
+        // Mapeia adicionando o indicador se a opção é a correta antes de embaralhar
+        const optionsWithFlag = questionData.options.map((opt, idx) => ({
+          ...opt,
+          isCorrect: idx === questionData.correctIndex
+        }));
+
+        // Salva as opções em ordem aleatória no estado
+        setCurrentOptions(shuffleArray(optionsWithFlag));
       };
 
       const changeScreen = (nextScreen) => {
@@ -403,6 +432,10 @@
         setSelectedOption(null);
         setAnswerState(null);
         setMascotExpr('thinking');
+
+        // Embaralha as opções da primeira pergunta
+        carregarOpcoesAleatorias(topic, 0);
+
         setScreen('QUIZ_PLAY');
 
         const firstQ = QUIZ_DATA[topic][0];
@@ -418,10 +451,10 @@
 
         parar_audio();
 
-        const currentQ = QUIZ_DATA[quizTopic][questionIndex];
+        const selectedOpt = currentOptions[index];
         setSelectedOption(index);
 
-        if (index === currentQ.correctIndex) {
+        if (selectedOpt && selectedOpt.isCorrect) {
           const res = window.scoreSystem ? window.scoreSystem.addPoints(10) : { totalScore: score + 10 };
           setScore(res.totalScore);
           if (window.scoreSystem) setHighScore(window.scoreSystem.highScore);
@@ -449,6 +482,10 @@
               setSelectedOption(null);
               setAnswerState(null);
               setMascotExpr('thinking');
+              
+              // Embaralha as opções para a próxima pergunta
+              carregarOpcoesAleatorias(quizTopic, nextIdx);
+
               speakText(QUIZ_DATA[quizTopic][nextIdx].question);
               
               let numeroDaPergunta = nextIdx + 1;
@@ -491,6 +528,8 @@
             speakText("Ops, resposta incorreta. Tente outra vez!");
         }
       };
+
+      const cornerLabelsDefault = ["Canto Sup. Esq.", "Canto Sup. Dir.", "Canto Inf. Esq.", "Canto Inf. Dir."];
 
       return (
         <div className="min-h-screen text-slate-800 flex flex-col justify-between p-4 relative z-10">
@@ -547,7 +586,7 @@
                 <LoboGuaraMascot expression="happy" isSpeaking={isSpeaking} size="normal" />
                 
                 <h2 className="text-2xl font-black text-amber-950 my-3 drop-shadow-sm">
-                  "O Cerrado Mineiro é cheio de Tesouros. Que tal descobrimos alguns deles?"
+                  O Cerrado Mineiro é cheio de Tesouros. Que tal descobrimos alguns deles?
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 w-full max-w-lg mt-2">
                   <button
@@ -602,9 +641,9 @@
                   </div>
                 </div>
 
-                {/* GRELHA DOS 4 CANTOS */}
+                {/* GRELHA DOS 4 CANTOS (OPÇÕES EMBARALHADAS) */}
                 <div className="grid grid-cols-2 gap-4 w-full">
-                  {QUIZ_DATA[quizTopic][questionIndex].options.map((opt, idx) => {
+                  {currentOptions.map((opt, idx) => {
                     const isSelected = selectedOption === idx;
                     let borderStyle = "border border-white/60 bg-white/40 hover:bg-white/60 backdrop-blur-sm";
 
@@ -630,7 +669,7 @@
                         </div>
                         <div className="flex-grow min-w-0">
                           <span className="block text-[10px] font-black text-amber-900 uppercase opacity-80">
-                            {opt.cornerLabel}
+                            {opt.cornerLabel || cornerLabelsDefault[idx]}
                           </span>
                           <span className="font-black text-slate-800 text-sm sm:text-base leading-tight block truncate">
                             {opt.title}
