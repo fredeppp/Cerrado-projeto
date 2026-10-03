@@ -9,7 +9,7 @@
   <audio id="meu-player" controls></audio>
   
   <script>
-      // Variável global para controlar o áudio atual e poder pará-lo
+    // Variável global para controlar o áudio atual e poder pará-lo
     let audioAtual = null;
 
     function parar_audio() {
@@ -90,7 +90,7 @@
           options: [
             { title: "Lobo-Guará", file: "lobo-guara.png", icon: "🦊"},
             { title: "Tamanduá-Bandeira", file: "tamandua bandeira.png", icon: "🦡"},
-            { title: "Seriema", file: "seriema.png", icon: "🦩"},
+            { title: "Seriema", file: "seriema.png", fallbackFiles: ["seriema.PNG"], icon: "🦩"},
             { title: "Onça Parda", file: "onça parda.png", icon: "🦛"}
           ]
         },
@@ -101,7 +101,7 @@
             { title: "Lobo-Guará", file: "lobo-guara.png", icon: "🦊"},
             { title: "Tamanduá-Bandeira", file: "tamandua bandeira.png", icon: "🦡"},
             { title: "Pato-Mergulhão", file: "pato mergulhao.png", icon: "🦆"},
-            { title: "Seriema", file: "seriema.png", icon: "🦩"}
+            { title: "Seriema", file: "seriema.png", fallbackFiles: ["seriema.PNG"], icon: "🦩"}
           ]
         },
         {
@@ -110,15 +110,15 @@
           options: [
             { title: "Pato-Mergulhão", file: "pato mergulhao.png", icon: "🦆"},
             { title: "Carcará", file: "carcara.png", icon: "🦅" },
-            { title: "Seriema", file: "seriema.PNG", icon: "🦩"},
-            { title: "Tucano", file: "tucano.PNG", icon: "🦜"}
+            { title: "Seriema", file: "seriema.PNG", fallbackFiles: ["seriema.png"], icon: "🦩"},
+            { title: "Tucano", file: "tucano.PNG", fallbackFiles: ["tucano.png"], icon: "🦜"}
           ]
         },
         {
           question: "Qual é o animal semi-aguatico do cerrado considerado o maior roedor do mundo?",
           correctIndex: 3,
           options: [
-            { title: "Tatu-Canastra", file: "tatu canastra.PNG", icon: "🦔"},
+            { title: "Tatu-Canastra", file: "tatu canastra.PNG", fallbackFiles: ["tatu canastra.png"], icon: "🦔"},
             { title: "Onça Parda", file: "onça parda.png", icon: "🦊"},
             { title: "Gambá", file: "gamba.png", icon: "🦌", cornerLabel: "Canto Inf. Esq." },
             { title: "Capivara", file: "capivara.png", icon: "🦛"}
@@ -143,14 +143,14 @@
             { title: "Pequi", file: "pequi.png", icon: "🟡"},
             { title: "Baru", file: "baru.png", icon: "🌰"},
             { title: "Castanha-de-Caju", file: "castanha-de-caju.png", icon: "🥜" },
-            { title: "Amendoim", file: "amendoin.png", icon: "🥜" }
+            { title: "Amendoim", file: "amendoin.png", fallbackFiles: ["amendoim.png"], icon: "🥜" }
           ]
         },
         {
           question: "Qual é o fruto nativo pequeno, azedinho e que é uma verdadeira bomba de vitamina C?",
           correctIndex: 2,
           options: [
-            { title: "Gravatá", file: "Gravatá.jpg", fallbackFiles: ["Gravata.png", "gravata.png"], icon: "🪴"},
+            { title: "Gravatá", file: "Gravatá.jpg", fallbackFiles: ["Gravata.png", "gravata.png", "gravata.jpg"], icon: "🪴"},
             { title: "Lobeira", file: "Lobeira.jpg", fallbackFiles: ["lobeira.jpg", "lobeira.png"], icon: "🟢"},
             { title: "Cajuzinho-do-Cerrado", file: "cajuzinho-do-cerrado.png", icon: "🥭" },
             { title: "Pitanga", file: "pitanga.png", icon: "🍒"}
@@ -163,7 +163,7 @@
             { title: "Jacarandá", file: "jacaranda.png", icon: "💜" },
             { title: "Pau-Tucano", file: "pau-tucano.png", icon: "🌸"},
             { title: "Cambuí", file: "cambuí.png", icon: "🌿"},
-            { title: "Ipê-Amarelo", file: "ipê-amarelo.png", icon: "🌼" }
+            { title: "Ipê-Amarelo", file: "ipê-amarelo.png", fallbackFiles: ["ipe-amarelo.png"], icon: "🌼" }
           ]
         }
       ],
@@ -174,7 +174,7 @@
           options: [
             { title: "Calagem do Solo", file: "calagem do solo.png", icon: "🧪"},
             { title: "Uso de Fogo", file: "uso do fogo.png", icon: "🔥" },
-            { title: "Irrigação Excessiva", file: "irrigação.png", icon: "💧" },
+            { title: "Irrigação Excessiva", file: "irrigação.png", fallbackFiles: ["irrigacao.png"], icon: "💧" },
             { title: "Desmatamento do Cerrado", file: "desmatamento do cerrado.png", icon: "🪓" }
           ]
         },
@@ -185,7 +185,7 @@
             { title: "Rio Aragari", file: "aragari.png", icon: "🌧️" },
             { title: "Rio Paranaíba", file: "nacente_paranaiba.png", icon: "🏞️" },
             { title: "Rio Abaeté", file: "nacente_abaite.png", icon: "🌊" },
-            { title: "Rio Doce", file: "Rio_Doce.jpg", icon: "💧" }
+            { title: "Rio Doce", file: "Rio_Doce.jpg", fallbackFiles: ["rio_doce.jpg", "rio_doce.png"], icon: "💧" }
           ]
         },
         {
@@ -193,8 +193,8 @@
           correctIndex: 2,
           options: [
             { title: "Uva", file: "uva.png", icon: "🍇" },
-            { title: "Soja", file: "soja.PNG", icon: "🌱"},
-            { title: "Café Especial", file: "café.png", icon: "☕"},
+            { title: "Soja", file: "soja.PNG", fallbackFiles: ["soja.png"], icon: "🌱"},
+            { title: "Café Especial", file: "café.png", fallbackFiles: ["cafe.png"], icon: "☕"},
             { title: "Milho", file: "milho.png", icon: "🌽" }
           ]
         },
@@ -202,10 +202,10 @@
           question: "Qual é o minerio estraido no município Araxá que possui as maiores reservas do planeta?",
           correctIndex: 3,
           options: [
-            { title: "Calcario", file: "calcario.PNG", icon: ":3"},
-            { title: "Minerio de Ferro", file: "ferro.PNG", icon: "frx was here"},
-            { title: "Fosfato", file: "fosfato.PNG", icon: "-_-"},
-            { title: "Nióbio", file: "niobio.PNG", icon: "bye"}
+            { title: "Calcario", file: "calcario.PNG", fallbackFiles: ["calcario.png"], icon: ":3"},
+            { title: "Minerio de Ferro", file: "ferro.PNG", fallbackFiles: ["ferro.png"], icon: "frx was here"},
+            { title: "Fosfato", file: "fosfato.PNG", fallbackFiles: ["fosfato.png"], icon: "-_-"},
+            { title: "Nióbio", file: "niobio.PNG", fallbackFiles: ["niobio.png"], icon: "bye"}
           ]
         }
       ]
@@ -281,18 +281,33 @@
         } catch (e) {}
       }, [storageKey]);
 
-      const buildCandidates = (mainFile, fallbacks) => {
-        const list = [mainFile, ...fallbacks];
+      const buildCandidates = (mainFile, fallbacks = []) => {
+        const list = [mainFile, ...(fallbacks || [])].filter(Boolean);
         const extra = [];
+
         list.forEach(f => {
-          if (!f) return;
+          const lower = f.toLowerCase();
           const noAccents = f.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          if (noAccents !== f) extra.push(noAccents);
-          if (f.endsWith('.png')) extra.push(f.replace('.png', '.jpg'), f.replace('.png', '.jpeg'));
-          if (f.endsWith('.jpg')) extra.push(f.replace('.jpg', '.png'), f.replace('.jpg', '.jpeg'));
-          extra.push(f.toLowerCase());
+          const noAccentsLower = lower.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+          extra.push(f);
+          extra.push(lower);
+          extra.push(noAccents);
+          extra.push(noAccentsLower);
+
+          const dotIndex = f.lastIndexOf('.');
+          const baseName = dotIndex !== -1 ? f.substring(0, dotIndex) : f;
+          const baseNameLower = baseName.toLowerCase();
+          const baseNameNoAccents = baseNameLower.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+          ['.png', '.PNG', '.jpg', '.JPG', '.jpeg', '.JPEG'].forEach(ext => {
+            extra.push(`${baseName}${ext}`);
+            extra.push(`${baseNameLower}${ext}`);
+            extra.push(`${baseNameNoAccents}${ext}`);
+          });
         });
-        return Array.from(new Set([...list, ...extra]));
+
+        return Array.from(new Set(extra));
       };
 
       const candidates = buildCandidates(fileName, fallbackFiles);
@@ -359,7 +374,8 @@
         );
       }
 
-      const currentPath = `imagens/${candidates[currentStep]}`;
+      // Usa encodeURI para tratar caminhos com espaços e acentos no GitHub Pages
+      const currentPath = `imagens/${encodeURI(candidates[currentStep])}`;
 
       return (
         <img
@@ -420,7 +436,6 @@
         const firstQ = QUIZ_DATA[topic][0];
         if (firstQ) {
           speakText(firstQ.question);
-          // Toca o áudio da primeira pergunta logo ao iniciar
           tocar_audio("pergunta1", topic);
         }
       };
@@ -428,7 +443,6 @@
       const handleCornerSelect = (index) => {
         if (answerState === 'correct') return;
 
-        // PARAR O ÁUDIO ASSIM QUE A RESPOSTA FOR ENTREGUE
         parar_audio();
 
         const currentQ = QUIZ_DATA[quizTopic][questionIndex];
@@ -442,14 +456,14 @@
           setAnswerState('correct');
           setMascotExpr('celebrate');
 
-          let dublador = "Lilia"; // Valor padrão
+          let dublador = "Lilia";
 
           if (quizTopic === "FAUNA") {
             dublador = "Lilia";
           } else if (quizTopic === "FLORA") {
             dublador = "Laura";
           } else if (quizTopic === "SOLO") {
-            dublador = "Maria"; // ou o nome da pasta correspondente na sua estrutura
+            dublador = "Maria";
           }
 
           tocar_audio("correto", dublador);
@@ -483,14 +497,14 @@
 
           setAnswerState('wrong');
           setMascotExpr('thinking');
-          let dublador = "Lilia"; // Valor padrão
+          let dublador = "Lilia";
 
           if (quizTopic === "FAUNA") {
             dublador = "Lilia";
           } else if (quizTopic === "FLORA") {
             dublador = "Laura";
           } else if (quizTopic === "SOLO") {
-            dublador = "Maria"; // ou o nome da pasta correspondente na sua estrutura
+            dublador = "Maria";
           }
 
           tocar_audio("incorreto", dublador);
@@ -508,7 +522,7 @@
               </span>
               <button 
                 onClick={() => changeScreen('WELCOME')}
-                className="bg-white/500 hover:bg-white/900 font-black px-7 py-6 text-text-xl backdrop-blur-sm p-2 rounded-full font-bold transition shadow-sm border border-white/50"
+                className="bg-white/50 hover:bg-white/90 font-black px-7 py-6 backdrop-blur-sm p-2 rounded-full shadow-sm border border-white/50"
               >
                 🏠
               </button>
@@ -670,10 +684,3 @@
   </script>
 </body>
 </html>
-<!--
-  _._     _,-'""`-._
- (,-.`._,'(       |\`-/|
-     `-.-' \ )-`( , o o)
-           `-    \`_`"'-
-                        frx
--->
